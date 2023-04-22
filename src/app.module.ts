@@ -11,7 +11,7 @@ import { MileageCarsModel } from './mileage-cars/mileage-cars.model';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'Z1234554321z',
+      password: 'root',
       database: 'av_by_auto_parser_db',
       models: [MileageCarsModel],
       autoLoadModels: true,
