@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { v4 } from 'uuid';
 
 import { MileageCarsModel } from './mileage-cars.model';
-import { CreateMileageCars, GetMileageCars } from './dto/mileage-cars.dto';
+import {
+  CreateMileageCars,
+  DeleteCar,
+  GetMileageCars,
+} from './dto/mileage-cars.dto';
 
 @Injectable()
 export class MileageCarsService {
@@ -79,5 +83,31 @@ export class MileageCarsService {
         generation: getMileageCars.generation,
       },
     });
+  }
+
+  async delete(deleteCar: DeleteCar) {
+    try {
+      const { uuid, carId } = deleteCar;
+
+      const dataFromDB = await this.mileageCarsRepository.findOne({
+        where: {
+          uuid,
+        },
+      });
+
+      const oldData = JSON.parse(JSON.stringify(dataFromDB.data));
+
+      oldData.lastSoldCars = oldData.lastSoldCars.filter(
+        (car) => car.id !== carId,
+      );
+
+      dataFromDB.data = oldData;
+
+      await dataFromDB.save();
+
+      return 'OK';
+    } catch (error) {
+      return new HttpException('Ошибка при удалении', HttpStatus.BAD_REQUEST);
+    }
   }
 }

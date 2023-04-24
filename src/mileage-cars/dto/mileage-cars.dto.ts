@@ -35,3 +35,8 @@ export class GetMileageCars {
   readonly generation: string;
   readonly year?: string;
 }
+
+export class DeleteCar {
+  readonly carId: number;
+  readonly uuid: string;
+}

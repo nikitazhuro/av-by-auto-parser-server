@@ -1,7 +1,11 @@
-import { Body, Controller, Post, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
 import { MileageCarsService } from './mileage-cars.service';
-import { CreateMileageCars, GetMileageCars } from './dto/mileage-cars.dto';
+import {
+  CreateMileageCars,
+  DeleteCar,
+  GetMileageCars,
+} from './dto/mileage-cars.dto';
 
 @Controller('mileage-cars')
 export class MileageCarsController {
@@ -15,5 +19,10 @@ export class MileageCarsController {
   @Post()
   getAll(@Body() getMileageCars: GetMileageCars) {
     return this.mileageCarsService.getAll(getMileageCars);
+  }
+
+  @Post('delete')
+  gelete(@Body() deleteCar: DeleteCar) {
+    return this.mileageCarsService.delete(deleteCar);
   }
 }
