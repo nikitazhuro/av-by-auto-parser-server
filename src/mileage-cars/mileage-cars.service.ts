@@ -8,12 +8,15 @@ import {
   DeleteCar,
   GetMileageCars,
 } from './dto/mileage-cars.dto';
+import { MileageCarsNewTestModel } from './mileage-cars.model';
 
 @Injectable()
 export class MileageCarsService {
   constructor(
     @InjectModel(MileageCarsModel)
     private mileageCarsRepository: typeof MileageCarsModel,
+    @InjectModel(MileageCarsNewTestModel)
+    private mileageCarsNewTestRep: typeof MileageCarsNewTestModel,
   ) {}
 
   async create(createMileageCars: CreateMileageCars) {
@@ -67,20 +70,29 @@ export class MileageCarsService {
 
   async getAll(getMileageCars: GetMileageCars) {
     if (getMileageCars.year) {
-      return this.mileageCarsRepository.findAll({
+      return this.mileageCarsNewTestRep.findAll({
         where: {
-          brand: getMileageCars.brand,
-          model: getMileageCars.model,
-          generation: getMileageCars.generation,
           year: getMileageCars.year,
+          customIds: {
+            avby: {
+              brandsId: getMileageCars.brand,
+              modelId: getMileageCars.model,
+              generationId: getMileageCars.generation,
+            },
+          },
         },
       });
     }
-    return this.mileageCarsRepository.findAll({
+
+    return this.mileageCarsNewTestRep.findAll({
       where: {
-        brand: getMileageCars.brand,
-        model: getMileageCars.model,
-        generation: getMileageCars.generation,
+        customIds: {
+          avby: {
+            brandsId: getMileageCars.brand,
+            modelId: getMileageCars.model,
+            generationId: getMileageCars.generation,
+          },
+        },
       },
     });
   }
