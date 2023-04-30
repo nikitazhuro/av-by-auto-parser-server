@@ -242,8 +242,9 @@ export class AVBYService {
             brandId: cars[i].metadata.brandId,
             modelId: cars[i].metadata.modelId,
             genId: cars[i].metadata.generationId,
-            genName: cars[i].properties.find((e) => e.name === 'generation')
-              .value,
+            genName:
+              cars[i].properties.find((e) => e.name === 'generation')?.value ||
+              '',
             brandUUID: brand.uuid,
             modelUUID: model.uuid,
           });
