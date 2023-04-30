@@ -97,6 +97,23 @@ export class MileageCarsService {
     });
   }
 
+  async all() {
+    return this.mileageCarsNewTestRep.findAll({
+      where: {
+        uuid: '06161bda-0dd9-44dc-ad73-b1afba71f392',
+        customIds: {
+          avby: {
+            brandsId: 6,
+            modelId: 5810,
+          },
+        },
+      },
+      include: {
+        all: true,
+      },
+    });
+  }
+
   async delete(deleteCar: DeleteCar) {
     try {
       const { uuid, carId } = deleteCar;

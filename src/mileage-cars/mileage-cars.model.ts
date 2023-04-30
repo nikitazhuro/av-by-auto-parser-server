@@ -14,7 +14,7 @@ export interface IMileageCar {
   brand: string;
   model: string;
   generation: string;
-  data: Array<string>;
+  data: any;
 }
 
 @Table({ tableName: 'mileage-cars' })
@@ -35,7 +35,7 @@ export class MileageCarsModel extends Model<MileageCarsModel, IMileageCar> {
   year: number;
 
   @Column({ type: DataType.JSON })
-  data: Array<string>;
+  data: any;
 }
 
 export interface ICustomIds {
@@ -59,7 +59,7 @@ export interface IMileageCarNewTest {
   data: any;
 }
 
-@Table({ tableName: 'mileage-cars-new-test' })
+@Table({ tableName: 'mileage_cars_new_test' })
 export class MileageCarsNewTestModel extends Model<
   MileageCarsNewTestModel,
   IMileageCarNewTest

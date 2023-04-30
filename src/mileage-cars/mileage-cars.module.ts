@@ -10,6 +10,7 @@ import { MileageCarsService } from './mileage-cars.service';
 import { ModelSchema } from 'src/model/model.model';
 import { AVBYService } from './avby.service';
 import { FileModule } from 'src/files/file.module';
+import { BrandModel } from 'src/brand/brand.model';
 
 @Module({
   imports: [
@@ -17,6 +18,8 @@ import { FileModule } from 'src/files/file.module';
       MileageCarsModel,
       ModelSchema,
       MileageCarsNewTestModel,
+      BrandModel,
+      ModelSchema,
     ]),
     FileModule,
   ],

@@ -11,6 +11,8 @@ import { BrandModel } from './brand/brand.model';
 import { BrandModule } from './brand/brand.module';
 import { ModelModule } from './model/model.module';
 import { ModelSchema } from './model/model.model';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -31,6 +33,9 @@ import { ModelSchema } from './model/model.model';
         MileageCarsNewTestModel,
       ],
       autoLoadModels: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'static'),
     }),
     MileageCarsModule,
     ModelModule,

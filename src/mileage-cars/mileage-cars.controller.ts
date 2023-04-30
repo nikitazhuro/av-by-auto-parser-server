@@ -34,4 +34,14 @@ export class MileageCarsController {
   fetchAllMileageCars() {
     return this.avbyService.fetchAllMileageCarsFromAV();
   }
+
+  @Get('get-all')
+  getAllMileageCars() {
+    return this.mileageCarsService.all();
+  }
+
+  @Get('rewrite-old')
+  rewriteOldDataToNewTable() {
+    return this.avbyService.rewriteOldDataToNewTable();
+  }
 }
