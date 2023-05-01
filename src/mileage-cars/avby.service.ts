@@ -194,7 +194,7 @@ export class AVBYService {
         },
       });
 
-      for (let i = 59; i < 70; i++) {
+      for (let i = 0; i < models.length; i++) {
         const brandId = models[i].brand.customIds.avby;
         const modelId = models[i].customIds.avby;
 
@@ -205,6 +205,14 @@ export class AVBYService {
           modelUUID: models[i].uuid,
         });
       }
+
+      console.log(
+        'Complete parsing',
+        new Date().toDateString(),
+        new Date().toLocaleTimeString(),
+      );
+
+      return 'OK';
     } catch (error) {}
   }
 
