@@ -37,15 +37,13 @@ export class AVBYService {
         const brandId = models[i].brand.customIds.avby;
         const modelId = models[i].customIds.avby;
 
-        if (brandId === 6) {
-          await this.fetchMileageCarsForYearsFromAv({
-            brandId,
-            modelId,
-            brandUUID: models[i].brandUUID,
-            modelUUID: models[i].uuid,
-            withPhotos,
-          });
-        }
+        await this.fetchMileageCarsForYearsFromAv({
+          brandId,
+          modelId,
+          brandUUID: models[i].brandUUID,
+          modelUUID: models[i].uuid,
+          withPhotos,
+        });
       }
 
       console.log(
