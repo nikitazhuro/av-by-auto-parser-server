@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { v4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -20,13 +20,24 @@ export class FileService {
         }),
     );
   }
-  async fetchPhotosFromAv(photos: Array<string>) {
+  async fetchPhotosFromAv({ brandName, modelName, genName, year, photosUrls }) {
     const resultImageUUIDs = [];
-    for (let i = 0; i < photos.length; i++) {
+    for (let i = 0; i < photosUrls.length; i++) {
       try {
         const uuid = v4();
-        const path = `static/${uuid}.jpg`;
-        await this.downloadImage(photos[i], path);
+        const pathCustom =
+          'static/' +
+          `${brandName ? `${brandName}/` : ''}` +
+          `${modelName ? `${modelName}/` : ''}` +
+          `${genName ? `${genName}/` : ''}` +
+          `${year ? `${year}/` : ''}`;
+
+        const filePath = path.resolve(__dirname, '..', '..', pathCustom);
+
+        if (!fs.existsSync(filePath)) {
+          fs.mkdirSync(filePath, { recursive: true });
+        }
+        await this.downloadImage(photosUrls[i], filePath + `/${uuid}.jpg`);
 
         resultImageUUIDs.push(uuid);
       } catch (error) {
@@ -35,21 +46,5 @@ export class FileService {
     }
 
     return resultImageUUIDs;
-  }
-
-  async createFile(fileData: any): Promise<string> {
-    try {
-      const fileName = `${v4()}.jpg`;
-      const filePath = path.resolve(__dirname, '..', 'static');
-      if (!fs.existsSync(filePath)) {
-        fs.mkdirSync(filePath, { recursive: true });
-      }
-
-      fs.writeFileSync(path.join(filePath, fileName), fileData.buffer);
-
-      return fileName;
-    } catch (error) {
-      throw new HttpException('File error', HttpStatus.BAD_REQUEST);
-    }
   }
 }

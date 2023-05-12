@@ -1,13 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { v4 } from 'uuid';
 
 import { MileageCarsModel } from './mileage-cars.model';
-import {
-  CreateMileageCars,
-  DeleteCar,
-  GetMileageCars,
-} from './dto/mileage-cars.dto';
+import { DeleteCar, GetMileageCars } from './dto/mileage-cars.dto';
 import { MileageCarsNewTestModel } from './mileage-cars.model';
 
 @Injectable()
@@ -18,55 +13,6 @@ export class MileageCarsService {
     @InjectModel(MileageCarsNewTestModel)
     private mileageCarsNewTestRep: typeof MileageCarsNewTestModel,
   ) {}
-
-  async create(createMileageCars: CreateMileageCars) {
-    const { brand, model, generation, data } = createMileageCars;
-
-    const dataToSave = [];
-
-    for (let i = 0; i < data.length; i++) {
-      const { year, ...otherData } = data[i];
-      dataToSave.push({
-        uuid: v4(),
-        brand,
-        model,
-        generation,
-        year,
-        data: otherData,
-      });
-    }
-
-    for (let i = 0; i < dataToSave.length; i++) {
-      const dataFromDB = await this.mileageCarsRepository.findOne({
-        where: {
-          brand,
-          model,
-          generation,
-          year: dataToSave[i].year,
-        },
-      });
-
-      if (dataFromDB) {
-        const oldData = JSON.parse(JSON.stringify(dataFromDB.data));
-
-        const oldLast5Ids = oldData.lastSoldCars.slice(0, 5).map((e) => e.id);
-
-        for (let j = dataToSave[i].data?.lastSoldCars.length - 1; j >= 0; j--) {
-          if (!oldLast5Ids.includes(dataToSave[i].data?.lastSoldCars[j]?.id)) {
-            oldData.lastSoldCars.unshift(dataToSave[i].data?.lastSoldCars[j]);
-          } else {
-            continue;
-          }
-        }
-
-        dataFromDB.data = oldData;
-
-        await dataFromDB.save();
-      } else {
-        await this.mileageCarsRepository.create(dataToSave[i]);
-      }
-    }
-  }
 
   async getAll(getMileageCars: GetMileageCars) {
     if (getMileageCars.year) {
@@ -93,23 +39,6 @@ export class MileageCarsService {
             generationId: getMileageCars.generation,
           },
         },
-      },
-    });
-  }
-
-  async all() {
-    return this.mileageCarsNewTestRep.findAll({
-      where: {
-        uuid: '06161bda-0dd9-44dc-ad73-b1afba71f392',
-        customIds: {
-          avby: {
-            brandsId: 6,
-            modelId: 5810,
-          },
-        },
-      },
-      include: {
-        all: true,
       },
     });
   }
