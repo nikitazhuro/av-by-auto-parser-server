@@ -17,6 +17,11 @@ export class MileageCarsController {
     return this.mileageCarsService.getAll(getMileageCars);
   }
 
+  @Get('qw')
+  qw() {
+    this.mileageCarsService.qw();
+  }
+
   @Post('delete')
   gelete(@Body() deleteCar: DeleteCar) {
     return this.mileageCarsService.delete(deleteCar);
