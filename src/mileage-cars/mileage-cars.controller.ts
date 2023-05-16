@@ -3,7 +3,6 @@ import { Body, Controller, Get, Query, Post } from '@nestjs/common';
 import { MileageCarsService } from './mileage-cars.service';
 import { DeleteCar, GetMileageCars } from './dto/mileage-cars.dto';
 import { AVBYService } from './avby.service';
-import * as path from 'path';
 
 @Controller('mileage-cars')
 export class MileageCarsController {
@@ -17,19 +16,16 @@ export class MileageCarsController {
     return this.mileageCarsService.getAll(getMileageCars);
   }
 
-  @Get('qw')
-  qw() {
-    this.mileageCarsService.qw();
-  }
-
   @Post('delete')
   gelete(@Body() deleteCar: DeleteCar) {
     return this.mileageCarsService.delete(deleteCar);
   }
 
   @Get('fetch-all')
-  fetchAllMileageCars(@Query('withPhotos') withPhotos = true) {
-    return this.avbyService.fetchAllMileageCarsFromAV(withPhotos);
+  fetchAllMileageCars(@Query('withPhotos') withPhotos: string) {
+    return this.avbyService.fetchAllMileageCarsFromAV(
+      withPhotos === '1' ? true : false,
+    );
   }
 
   @Get('rewrite-old')

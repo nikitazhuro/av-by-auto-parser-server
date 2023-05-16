@@ -4,7 +4,10 @@ import { v4 } from 'uuid';
 import axios from 'axios';
 
 import { IMileageCarNewTest, MileageCarsModel } from './mileage-cars.model';
-import { MileageCarFromAv } from './dto/mileage-cars.dto';
+import {
+  ILastSoldMileageCarFromAv,
+  MileageCarFromAv,
+} from './dto/mileage-cars.dto';
 import { ModelSchema } from 'src/model/model.model';
 import { GenFromAv } from './utils/gens';
 import { MileageCarsNewTestModel } from './mileage-cars.model';
@@ -257,13 +260,10 @@ export class AVBYService {
 
         let photosUUIDs: string[] = [];
 
-        const findValueFromProps = (key: string) => {
-          return lastSoldCar.properties.find((prop) => prop.name === key).value;
-        };
         if (withPhotos) {
           photosUUIDs = await this.fileService.fetchPhotosFromAv({
-            brandName: findValueFromProps('brand'),
-            modelName: findValueFromProps('model'),
+            brandName: this.findValueFromProps('brand', lastSoldCar),
+            modelName: this.findValueFromProps('model', lastSoldCar),
             genName,
             year,
             photosUrls,
@@ -284,7 +284,7 @@ export class AVBYService {
             },
           },
           year,
-          mileage_km: findValueFromProps('mileage_km'),
+          mileage_km: this.findValueFromProps('mileage_km', lastSoldCar),
           photos: photosUUIDs,
           data: {
             avbyPhotosLinks: photosUrls,
@@ -298,4 +298,11 @@ export class AVBYService {
       }
     } catch (error) {}
   }
+
+  private findValueFromProps = (
+    key: string,
+    lastSoldCar: ILastSoldMileageCarFromAv,
+  ) => {
+    return lastSoldCar.properties.find((prop) => prop.name === key).value;
+  };
 }

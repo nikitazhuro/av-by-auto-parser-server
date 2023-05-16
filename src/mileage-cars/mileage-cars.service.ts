@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { MileageCarsModel } from './mileage-cars.model';
 import { DeleteCar, GetMileageCars } from './dto/mileage-cars.dto';
 import { MileageCarsNewTestModel } from './mileage-cars.model';
-import axios from 'axios';
 
 @Injectable()
 export class MileageCarsService {
@@ -14,42 +13,6 @@ export class MileageCarsService {
     @InjectModel(MileageCarsNewTestModel)
     private mileageCarsNewTestRep: typeof MileageCarsNewTestModel,
   ) {}
-
-  async qw() {
-    const cars = await this.mileageCarsNewTestRep.findAll();
-
-    for (let i = 0; i < cars.length; i++) {
-      if (!cars[i].data.avbyPhotosLinks) {
-        try {
-          const car = await axios.get(
-            `https://api.av.by/offers/${cars[i].customIds.avby.carId}`,
-          );
-
-          const photosUrls = car.data.photos.map((photosObj) => {
-            if (photosObj.medium) {
-              return photosObj.medium.url;
-            }
-            if (photosObj.big) {
-              return photosObj.big.url;
-            }
-            if (photosObj.small) {
-              return photosObj.small.url;
-            }
-            if (photosObj.extrasmall) {
-              return photosObj.extrasmall.url;
-            }
-          });
-          cars[i].data = { ...cars[i].data, avbyPhotosLinks: photosUrls };
-
-          await cars[i].save();
-        } catch (error) {
-          console.log(error.message);
-        }
-      }
-    }
-
-    console.log('COMPLETE PHOTOS');
-  }
 
   async getAll(getMileageCars: GetMileageCars) {
     if (getMileageCars.year) {

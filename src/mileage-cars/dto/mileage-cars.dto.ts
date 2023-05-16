@@ -662,7 +662,7 @@ export class MileageCarFromAvTitle {
   readonly image: string;
 }
 
-export class LastSoldMileageCarFromAv {
+export class ILastSoldMileageCarFromAv {
   readonly id: number;
   readonly originalDaysOnSale: number;
   readonly advertType: string;
@@ -741,7 +741,7 @@ export class LastSoldMileageCarFromAv {
 
 export class MileageCarFromAv {
   readonly title: MileageCarFromAvTitle;
-  readonly lastSoldAdverts: Array<LastSoldMileageCarFromAv>;
+  readonly lastSoldAdverts: Array<ILastSoldMileageCarFromAv>;
   readonly mediumPrice: {
     priceUsd: number;
     priceByn: number;
