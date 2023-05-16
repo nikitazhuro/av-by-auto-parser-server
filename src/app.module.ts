@@ -2,10 +2,7 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 import { MileageCarsModule } from './mileage-cars/mileage-cars.module';
-import {
-  MileageCarsModel,
-  MileageCarsNewTestModel,
-} from './mileage-cars/mileage-cars.model';
+import { MileageCarsModel } from './mileage-cars/mileage-cars.model';
 import { ConfigModule } from '@nestjs/config';
 import { BrandModel } from './brand/brand.model';
 import { BrandModule } from './brand/brand.module';
@@ -26,12 +23,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [
-        MileageCarsModel,
-        BrandModel,
-        ModelSchema,
-        MileageCarsNewTestModel,
-      ],
+      models: [MileageCarsModel, BrandModel, ModelSchema],
       autoLoadModels: true,
     }),
     ServeStaticModule.forRoot({
