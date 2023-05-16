@@ -1,17 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
-import { MileageCarsModel } from './mileage-cars.model';
 import { DeleteCar, GetMileageCars } from './dto/mileage-cars.dto';
-import { MileageCarsNewTestModel } from './mileage-cars.model';
+import { MileageCarsModel } from './mileage-cars.model';
 
 @Injectable()
 export class MileageCarsService {
   constructor(
     @InjectModel(MileageCarsModel)
-    private mileageCarsRepository: typeof MileageCarsModel,
-    @InjectModel(MileageCarsNewTestModel)
-    private mileageCarsNewTestRep: typeof MileageCarsNewTestModel,
+    private mileageCarsNewTestRep: typeof MileageCarsModel,
   ) {}
 
   async getAll(getMileageCars: GetMileageCars) {
@@ -43,25 +40,29 @@ export class MileageCarsService {
     });
   }
 
+  async findOneByAvId(carId: number) {
+    const car = await this.mileageCarsNewTestRep.findOne({
+      where: {
+        customIds: {
+          avby: {
+            carId,
+          },
+        },
+      },
+    });
+
+    return car;
+  }
+
   async delete(deleteCar: DeleteCar) {
     try {
-      const { uuid, carId } = deleteCar;
+      const { uuid } = deleteCar;
 
-      const dataFromDB = await this.mileageCarsRepository.findOne({
+      await this.mileageCarsNewTestRep.destroy({
         where: {
           uuid,
         },
       });
-
-      const oldData = JSON.parse(JSON.stringify(dataFromDB.data));
-
-      oldData.lastSoldCars = oldData.lastSoldCars.filter(
-        (car) => car.id !== carId,
-      );
-
-      dataFromDB.data = oldData;
-
-      await dataFromDB.save();
 
       return 'OK';
     } catch (error) {

@@ -1,10 +1,7 @@
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Module } from '@nestjs/common';
 
-import {
-  MileageCarsModel,
-  MileageCarsNewTestModel,
-} from './mileage-cars.model';
+import { MileageCarsModel } from './mileage-cars.model';
 import { MileageCarsController } from './mileage-cars.controller';
 import { MileageCarsService } from './mileage-cars.service';
 import { ModelSchema } from 'src/model/model.model';
@@ -15,9 +12,8 @@ import { BrandModel } from 'src/brand/brand.model';
 @Module({
   imports: [
     SequelizeModule.forFeature([
-      MileageCarsModel,
       ModelSchema,
-      MileageCarsNewTestModel,
+      MileageCarsModel,
       BrandModel,
       ModelSchema,
     ]),

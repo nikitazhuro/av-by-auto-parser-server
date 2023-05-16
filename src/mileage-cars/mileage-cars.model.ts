@@ -6,37 +6,9 @@ import {
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
+
 import { BrandModel } from 'src/brand/brand.model';
 import { ModelSchema } from 'src/model/model.model';
-
-export interface IMileageCar {
-  uuid: string;
-  brand: string;
-  model: string;
-  generation: string;
-  data: any;
-}
-
-@Table({ tableName: 'mileage-cars' })
-export class MileageCarsModel extends Model<MileageCarsModel, IMileageCar> {
-  @Column({ primaryKey: true, type: DataType.UUID })
-  uuid: string;
-
-  @Column({ type: DataType.INTEGER })
-  brand: number;
-
-  @Column({ type: DataType.INTEGER })
-  model: number;
-
-  @Column({ type: DataType.INTEGER })
-  generation: number;
-
-  @Column({ type: DataType.INTEGER })
-  year: number;
-
-  @Column({ type: DataType.JSON })
-  data: any;
-}
 
 export interface ICustomIds {
   avby: {
@@ -47,7 +19,7 @@ export interface ICustomIds {
   };
 }
 
-export interface IMileageCarNewTest {
+export interface IMileageCar {
   uuid: string;
   brandUUID: string;
   modelUUID: string;
@@ -60,10 +32,7 @@ export interface IMileageCarNewTest {
 }
 
 @Table({ tableName: 'mileage_cars_new_test' })
-export class MileageCarsNewTestModel extends Model<
-  MileageCarsNewTestModel,
-  IMileageCarNewTest
-> {
+export class MileageCarsModel extends Model<MileageCarsModel, IMileageCar> {
   @Column({ primaryKey: true, type: DataType.UUID })
   uuid: string;
 

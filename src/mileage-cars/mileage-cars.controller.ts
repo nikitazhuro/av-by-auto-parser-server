@@ -27,9 +27,4 @@ export class MileageCarsController {
       withPhotos === '1' ? true : false,
     );
   }
-
-  @Get('rewrite-old')
-  rewriteOldDataToNewTable() {
-    return this.avbyService.rewriteOldDataToNewTable();
-  }
 }
