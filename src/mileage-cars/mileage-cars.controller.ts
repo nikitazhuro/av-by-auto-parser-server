@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Query, Post } from '@nestjs/common';
 
 import { MileageCarsService } from './mileage-cars.service';
-import { DeleteCar, GetMileageCars } from './dto/mileage-cars.dto';
+import {
+  DeleteCar,
+  FetchMileageCarsQuery,
+  GetMileageCars,
+} from './dto/mileage-cars.dto';
 import { AVBYService } from './avby.service';
 
 @Controller('mileage-cars')
@@ -22,9 +26,7 @@ export class MileageCarsController {
   }
 
   @Get('fetch-all')
-  fetchAllMileageCars(@Query('withPhotos') withPhotos: string) {
-    return this.avbyService.fetchAllMileageCarsFromAV(
-      withPhotos === '1' ? true : false,
-    );
+  fetchAllMileageCars(@Query() query: FetchMileageCarsQuery) {
+    return this.avbyService.fetchAllMileageCarsFromAV(query);
   }
 }

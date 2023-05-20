@@ -137,3 +137,12 @@ export class MileageCarFromAv {
     };
   };
 }
+
+export interface IFetchMileageCarsForYearsFromAv {
+  brandId: number;
+  modelId: number;
+  brandUUID: string;
+  modelUUID: string;
+  withPhotos: boolean;
+  generation?: number;
+}

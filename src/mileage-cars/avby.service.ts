@@ -13,7 +13,12 @@ import {
   findValueFromProps,
   getPhotosUrlsFromLastSoldAvCar,
 } from './helpers/index';
-import { IGenerationFromAv, MileageCarFromAv } from './types';
+import {
+  IFetchMileageCarsForYearsFromAv,
+  IGenerationFromAv,
+  MileageCarFromAv,
+} from './types';
+import { FetchMileageCarsQuery } from './dto/mileage-cars.dto';
 
 @Injectable()
 export class AVBYService {
@@ -21,14 +26,13 @@ export class AVBYService {
     private readonly mileageCarsService: MileageCarsService,
     @InjectModel(MileageCarsModel)
     private mileageCarsRepository: typeof MileageCarsModel,
-    @InjectModel(BrandModel)
-    private brandsRep: typeof BrandModel,
     @InjectModel(ModelSchema)
     private modelsRepository: typeof ModelSchema,
     private readonly fileService: FileService,
   ) {}
 
-  async fetchAllMileageCarsFromAV(withPhotos: boolean) {
+  async fetchAllMileageCarsFromAV(query: FetchMileageCarsQuery) {
+    const { withPhotos, brand, model, generation } = query;
     try {
       const models = await this.modelsRepository.findAll({
         include: {
@@ -36,17 +40,43 @@ export class AVBYService {
         },
       });
 
-      for (let i = 0; i < models.length; i++) {
-        const brandId = models[i].brand.customIds.avby;
-        const modelId = models[i].customIds.avby;
-
-        await this.fetchMileageCarsForYearsFromAv({
-          brandId,
-          modelId,
-          brandUUID: models[i].brandUUID,
-          modelUUID: models[i].uuid,
-          withPhotos,
+      if (generation || model) {
+        const modelSchema = await this.modelsRepository.findOne({
+          where: {
+            customIds: {
+              avby: +model,
+            },
+          },
         });
+
+        const config: IFetchMileageCarsForYearsFromAv = {
+          brandId: +brand,
+          modelId: +model,
+          brandUUID: modelSchema.brandUUID,
+          modelUUID: modelSchema.uuid,
+          withPhotos: withPhotos === '1',
+        };
+
+        if (generation) {
+          config.generation = +generation;
+
+          await this.fetchMileageCarsForYearsFromAv(config);
+        } else {
+          await this.fetchMileageCarsForYearsFromAv(config);
+        }
+      } else {
+        for (let i = 0; i < models.length; i++) {
+          const brandId = models[i].brand.customIds.avby;
+          const modelId = models[i].customIds.avby;
+
+          await this.fetchMileageCarsForYearsFromAv({
+            brandId,
+            modelId,
+            brandUUID: models[i].brandUUID,
+            modelUUID: models[i].uuid,
+            withPhotos: withPhotos === '1',
+          });
+        }
       }
 
       console.log(
@@ -65,41 +95,78 @@ export class AVBYService {
     brandUUID,
     modelUUID,
     withPhotos,
-  }) {
+    generation,
+  }: IFetchMileageCarsForYearsFromAv) {
     try {
       const gens = await this.getGensFromAVBY(brandId, modelId);
 
       if (gens.length) {
         for (let j = 0; j < gens.length; j++) {
-          if (gens[j]?.yearTo && gens[j]?.yearFrom) {
-            for (let k = gens[j]?.yearFrom; k <= gens[j]?.yearTo; k++) {
-              await this.fetchMileageCarsPerYearFromAv({
-                brandId,
-                modelId,
-                genId: gens[j].id,
-                year: k,
-                genName: gens[j].name,
-                brandUUID,
-                modelUUID,
-                withPhotos,
-              });
+          if (generation || generation === 0) {
+            if (generation === gens[j].id) {
+              if (gens[j]?.yearTo && gens[j]?.yearFrom) {
+                for (let k = gens[j]?.yearFrom; k <= gens[j]?.yearTo; k++) {
+                  await this.fetchMileageCarsPerYearFromAv({
+                    brandId,
+                    modelId,
+                    genId: gens[j].id,
+                    year: k,
+                    genName: gens[j].name,
+                    brandUUID,
+                    modelUUID,
+                    withPhotos,
+                  });
+                }
+              }
+
+              if (!gens[j]?.yearTo && gens[j]?.yearFrom) {
+                const year = new Date().getFullYear();
+
+                for (let k = gens[j]?.yearFrom; k <= year; k++) {
+                  await this.fetchMileageCarsPerYearFromAv({
+                    brandId,
+                    modelId,
+                    genId: gens[j].id,
+                    year: k,
+                    genName: gens[j].name,
+                    brandUUID,
+                    modelUUID,
+                    withPhotos,
+                  });
+                }
+              }
             }
-          }
+          } else {
+            if (gens[j]?.yearTo && gens[j]?.yearFrom) {
+              for (let k = gens[j]?.yearFrom; k <= gens[j]?.yearTo; k++) {
+                await this.fetchMileageCarsPerYearFromAv({
+                  brandId,
+                  modelId,
+                  genId: gens[j].id,
+                  year: k,
+                  genName: gens[j].name,
+                  brandUUID,
+                  modelUUID,
+                  withPhotos,
+                });
+              }
+            }
 
-          if (!gens[j]?.yearTo && gens[j]?.yearFrom) {
-            const year = new Date().getFullYear();
+            if (!gens[j]?.yearTo && gens[j]?.yearFrom) {
+              const year = new Date().getFullYear();
 
-            for (let k = gens[j]?.yearFrom; k <= year; k++) {
-              await this.fetchMileageCarsPerYearFromAv({
-                brandId,
-                modelId,
-                genId: gens[j].id,
-                year: k,
-                genName: gens[j].name,
-                brandUUID,
-                modelUUID,
-                withPhotos,
-              });
+              for (let k = gens[j]?.yearFrom; k <= year; k++) {
+                await this.fetchMileageCarsPerYearFromAv({
+                  brandId,
+                  modelId,
+                  genId: gens[j].id,
+                  year: k,
+                  genName: gens[j].name,
+                  brandUUID,
+                  modelUUID,
+                  withPhotos,
+                });
+              }
             }
           }
         }
