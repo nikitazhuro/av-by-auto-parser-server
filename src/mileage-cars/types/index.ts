@@ -37,18 +37,20 @@ export interface IGenerationFromAv {
   yearTo: number;
 }
 
+export interface IProperty {
+  name: string;
+  id: number;
+  value: string;
+  fallbackType: string;
+}
+
 export class ILastSoldMileageCarFromAv {
   readonly id: number;
   readonly originalDaysOnSale: number;
   readonly advertType: string;
   readonly status: string;
   readonly publicStatus: { label: string; name: string };
-  readonly properties: Array<{
-    value: string;
-    id: number;
-    name: string;
-    fallbackType: string;
-  }>;
+  readonly properties: Array<IProperty>;
   readonly photos: Array<{
     id: number;
     main: boolean;

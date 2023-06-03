@@ -8,12 +8,43 @@ import { MileageCarsModel } from './mileage-cars.model';
 export class MileageCarsService {
   constructor(
     @InjectModel(MileageCarsModel)
-    private mileageCarsNewTestRep: typeof MileageCarsModel,
+    private mileageCarsRepository: typeof MileageCarsModel,
   ) {}
+
+  async changeProperties() {
+    const allCars = await this.mileageCarsRepository.findAll({
+      include: {
+        all: true,
+      },
+    });
+
+    for (let i = 0; i < allCars.length; i++) {
+      if (allCars[i].data.properties?.length) {
+        const obj = {};
+
+        allCars[i].data.properties?.forEach((prop) => {
+          if (!obj[prop.name]) {
+            obj[prop.name] = {
+              value: prop.value,
+              id: prop.id,
+            };
+          }
+        });
+        const newData = {
+          ...allCars[i].data,
+          properties: obj,
+        };
+
+        allCars[i].data = newData;
+
+        await allCars[i].save();
+      }
+    }
+  }
 
   async getAll(getMileageCars: GetMileageCars) {
     if (getMileageCars.year) {
-      return this.mileageCarsNewTestRep.findAll({
+      return this.mileageCarsRepository.findAll({
         where: {
           year: getMileageCars.year,
           customIds: {
@@ -27,7 +58,7 @@ export class MileageCarsService {
       });
     }
 
-    return this.mileageCarsNewTestRep.findAll({
+    return this.mileageCarsRepository.findAll({
       where: {
         customIds: {
           avby: {
@@ -41,7 +72,7 @@ export class MileageCarsService {
   }
 
   async findOneByAvId(carId: number) {
-    const car = await this.mileageCarsNewTestRep.findOne({
+    const car = await this.mileageCarsRepository.findOne({
       where: {
         customIds: {
           avby: {
@@ -58,7 +89,7 @@ export class MileageCarsService {
     try {
       const { uuid } = deleteCar;
 
-      await this.mileageCarsNewTestRep.destroy({
+      await this.mileageCarsRepository.destroy({
         where: {
           uuid,
         },

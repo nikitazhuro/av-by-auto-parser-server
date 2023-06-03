@@ -15,6 +15,11 @@ export class MileageCarsController {
     private readonly avbyService: AVBYService,
   ) {}
 
+  @Get('change-prop')
+  changeProperties() {
+    return this.mileageCarsService.changeProperties();
+  }
+
   @Post()
   getAll(@Body() getMileageCars: GetMileageCars) {
     return this.mileageCarsService.getAll(getMileageCars);

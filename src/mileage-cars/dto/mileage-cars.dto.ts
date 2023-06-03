@@ -2,6 +2,7 @@ export class GetMileageCars {
   readonly brand: string;
   readonly model: string;
   readonly generation: string;
+  readonly engine_capacity?: string;
   readonly year?: string;
 }
 

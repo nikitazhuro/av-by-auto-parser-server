@@ -6,7 +6,6 @@ import { ModelSchema } from 'src/model/model.model';
 
 import { MileageCarsModel } from './mileage-cars.model';
 import { FileService } from 'src/files/file.service';
-import { BrandModel } from 'src/brand/brand.model';
 import { MileageCarsService } from './mileage-cars.service';
 import {
   createCarConfigHelper,
