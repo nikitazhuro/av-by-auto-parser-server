@@ -100,7 +100,7 @@ export class MileageCarsService {
         };
       }
 
-      if (filter.engine_type) {
+      if (!isEmpty(filter.engine_type)) {
         whereConfig.data.properties.engine_type.value[Op.in] =
           filter.engine_type;
       }
@@ -110,11 +110,11 @@ export class MileageCarsService {
           filter.transmission_type;
       }
 
-      if (filter.body_type) {
+      if (!isEmpty(filter.body_type)) {
         whereConfig.data.properties.body_type.value[Op.in] = filter.body_type;
       }
 
-      if (filter.drive_type) {
+      if (!isEmpty(filter.drive_type)) {
         whereConfig.data.properties.drive_type.value[Op.in] = filter.drive_type;
       }
 
