@@ -42,6 +42,8 @@ export class MileageCarsService {
         await allCars[i].save();
       }
     }
+
+    return 'OK';
   }
 
   async getAll(getMileageCars: GetMileageCars) {
