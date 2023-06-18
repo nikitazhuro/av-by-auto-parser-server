@@ -20,9 +20,12 @@ export class MileageCarsService {
       },
     });
 
+    console.log(allCars);
+
     for (let i = 0; i < allCars.length; i++) {
       if (allCars[i].data.properties?.length) {
         const obj = {};
+        console.log(i);
 
         allCars[i].data.properties?.forEach((prop) => {
           if (!obj[prop.name]) {
