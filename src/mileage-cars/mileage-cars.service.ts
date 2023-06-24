@@ -50,14 +50,16 @@ export class MileageCarsService {
   }
 
   async getAll(getMileageCars: GetMileageCars) {
-    const { filter, brand, model, generation, year } = getMileageCars;
+    const { filter, brand, model, generations, year } = getMileageCars;
 
     const whereConfig: any = {
       customIds: {
         avby: {
           brandsId: brand,
           modelId: model,
-          generationId: generation,
+          generationId: {
+            [Op.in]: generations,
+          },
         },
       },
       data: {

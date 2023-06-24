@@ -31,7 +31,13 @@ export class AVBYService {
   ) {}
 
   async fetchAllMileageCarsFromAV(query: FetchMileageCarsQuery) {
-    const { withPhotos, brand, model, generation } = query;
+    const { withPhotos, brand, model, generations } = query;
+    let arrFromGenerationsQueryString = [];
+
+    if (generations) {
+      arrFromGenerationsQueryString = generations.split(',').map((gen) => +gen);
+    }
+
     try {
       const models = await this.modelsRepository.findAll({
         include: {
@@ -39,7 +45,7 @@ export class AVBYService {
         },
       });
 
-      if (generation || model) {
+      if (generations || model) {
         const modelSchema = await this.modelsRepository.findOne({
           where: {
             customIds: {
@@ -56,10 +62,14 @@ export class AVBYService {
           withPhotos: withPhotos === '1',
         };
 
-        if (generation) {
-          config.generation = +generation;
+        if (generations) {
+          for (let i = 0; i < arrFromGenerationsQueryString.length; i++) {
+            config.generation = arrFromGenerationsQueryString[i];
 
-          await this.fetchMileageCarsForYearsFromAv(config);
+            console.log(config, 'config');
+
+            await this.fetchMileageCarsForYearsFromAv(config);
+          }
         } else {
           await this.fetchMileageCarsForYearsFromAv(config);
         }

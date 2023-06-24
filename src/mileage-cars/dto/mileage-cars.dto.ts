@@ -18,7 +18,7 @@ export class Filter {
 export class GetMileageCars {
   readonly brand: string;
   readonly model: string;
-  readonly generation: string;
+  readonly generations: number[];
   readonly engine_capacity?: string;
   readonly year?: string;
   readonly filter?: Filter;
@@ -31,7 +31,7 @@ export class DeleteCar {
 export class FetchMileageCarsQuery {
   readonly brand?: string;
   readonly model?: string;
-  readonly generation?: string;
+  readonly generations?: string;
   readonly year?: string;
   readonly withPhotos: string;
 }
