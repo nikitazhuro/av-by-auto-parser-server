@@ -6,6 +6,11 @@ export class BrandController {
   constructor(private readonly brandService: BrandService) {}
 
   @Get()
+  getBrands() {
+    return this.brandService.getBrands();
+  }
+
+  @Get('/av')
   getBrandsFromAVBY() {
     return this.brandService.getBrandsFromAVBY();
   }

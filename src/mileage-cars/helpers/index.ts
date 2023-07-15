@@ -1,7 +1,11 @@
 import { v4 } from 'uuid';
 
-import { IMileageCar } from '../mileage-cars.model';
-import { ILastSoldMileageCarFromAv, IProperty } from '../types';
+import { IMileageCar } from '../mileage-cars.schema';
+import {
+  ICreateCarConfig,
+  ILastSoldMileageCarFromAv,
+  IProperty,
+} from '../types';
 
 export const getPhotosUrlsFromLastSoldAvCar = (
   lastSoldCar: ILastSoldMileageCarFromAv,
@@ -44,38 +48,29 @@ const prepareProperties = (oldProps: Array<IProperty>) => {
   return resultProps;
 };
 
-export const createCarConfigHelper = ({
-  brandUUID,
-  modelUUID,
-  genName,
-  brandId,
-  modelId,
-  genId,
-  year,
-  lastSoldCar,
-  photosUUIDs,
-  photosUrls,
-}): IMileageCar => {
+export const createCarConfigHelper = (
+  config: ICreateCarConfig,
+): IMileageCar => {
   const createCarConfig = {
     uuid: v4(),
-    brandUUID,
-    modelUUID,
-    generation: genName,
+    brandUUID: config.brandUUID,
+    modelUUID: config.modelUUID,
+    generationUUID: config.genUUID,
     customIds: {
       avby: {
-        brandsId: brandId,
-        modelId: modelId,
-        generationId: genId,
-        carId: lastSoldCar.id,
+        brandsId: config.brandId,
+        modelId: config.modelId,
+        generationId: config.genId,
+        carId: config.lastSoldCar.id,
       },
     },
-    year,
-    mileage_km: findValueFromProps('mileage_km', lastSoldCar),
-    photos: photosUUIDs,
+    year: config.year,
+    mileage_km: findValueFromProps('mileage_km', config.lastSoldCar),
+    photos: config.photosUUIDs,
     data: {
-      avbyPhotosLinks: photosUrls,
-      ...lastSoldCar,
-      properties: prepareProperties(lastSoldCar.properties),
+      avbyPhotosLinks: config.photosUrls,
+      ...config.lastSoldCar,
+      properties: prepareProperties(config.lastSoldCar.properties),
     },
   };
 

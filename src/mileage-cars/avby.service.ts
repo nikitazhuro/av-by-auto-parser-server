@@ -2,193 +2,163 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import axios from 'axios';
 
-import { ModelSchema } from 'src/model/model.model';
+import { ModelSchema } from 'src/model/model.schema';
 
-import { MileageCarsModel } from './mileage-cars.model';
+import { MileageCarsSchema } from './mileage-cars.schema';
 import { FileService } from 'src/files/file.service';
 import { MileageCarsService } from './mileage-cars.service';
 import {
   createCarConfigHelper,
-  findValueFromProps,
   getPhotosUrlsFromLastSoldAvCar,
 } from './helpers/index';
 import {
   IFetchMileageCarsForYearsFromAv,
+  IFetchPhotosConfig,
   IGenerationFromAv,
+  ILastSoldCarsConfig,
+  IMileageCarPerYearConfig,
+  IMileageCarPerYearCreateConfig,
   MileageCarFromAv,
 } from './types';
 import { FetchMileageCarsQuery } from './dto/mileage-cars.dto';
+import { GenerationSchema } from 'src/generation/generation.schema';
 
 @Injectable()
 export class AVBYService {
   constructor(
     private readonly mileageCarsService: MileageCarsService,
-    @InjectModel(MileageCarsModel)
-    private mileageCarsRepository: typeof MileageCarsModel,
-    @InjectModel(ModelSchema)
-    private modelsRepository: typeof ModelSchema,
+    @InjectModel(MileageCarsSchema)
+    private mileageCarsRepository: typeof MileageCarsSchema,
+    @InjectModel(GenerationSchema)
+    private generationRepository: typeof GenerationSchema,
     private readonly fileService: FileService,
   ) {}
 
   async fetchAllMileageCarsFromAV(query: FetchMileageCarsQuery) {
-    const { withPhotos, brand, model, generations } = query;
-    let arrFromGenerationsQueryString = [];
+    const { withPhotos, generationUUIDs, modelUUID, brandUUID } = query;
 
-    if (generations) {
-      arrFromGenerationsQueryString = generations.split(',').map((gen) => +gen);
-    }
-
-    try {
-      const models = await this.modelsRepository.findAll({
-        include: {
-          all: true,
-        },
-      });
-
-      if (generations || model) {
-        const modelSchema = await this.modelsRepository.findOne({
-          where: {
-            customIds: {
-              avby: +model,
-            },
-          },
-        });
-
-        const config: IFetchMileageCarsForYearsFromAv = {
-          brandId: +brand,
-          modelId: +model,
-          brandUUID: modelSchema.brandUUID,
-          modelUUID: modelSchema.uuid,
-          withPhotos: withPhotos === '1',
-        };
-
-        if (generations) {
-          for (let i = 0; i < arrFromGenerationsQueryString.length; i++) {
-            config.generation = arrFromGenerationsQueryString[i];
-
-            console.log(config, 'config');
-
-            await this.fetchMileageCarsForYearsFromAv(config);
-          }
-        } else {
-          await this.fetchMileageCarsForYearsFromAv(config);
-        }
-      } else {
-        for (let i = 0; i < models.length; i++) {
-          const brandId = models[i].brand.customIds.avby;
-          const modelId = models[i].customIds.avby;
-
-          await this.fetchMileageCarsForYearsFromAv({
-            brandId,
-            modelId,
-            brandUUID: models[i].brandUUID,
-            modelUUID: models[i].uuid,
-            withPhotos: withPhotos === '1',
-          });
-        }
-      }
-
+    const completeParsingLog = async () => {
       console.log(
         'Complete parsing',
         new Date().toDateString(),
         new Date().toLocaleTimeString(),
       );
+    };
 
-      return 'OK';
+    try {
+      if (generationUUIDs) {
+        await this.queryFetchWithGens(generationUUIDs, withPhotos);
+        await completeParsingLog();
+
+        return;
+      } else if (modelUUID) {
+        await this.queryFetchWithModelUUID(modelUUID, withPhotos);
+        await completeParsingLog();
+
+        return;
+      } else if (brandUUID) {
+        await this.queryFetchWithBrandUUID(brandUUID, withPhotos);
+        await completeParsingLog();
+
+        return;
+      } else {
+        await this.fetchAll(withPhotos);
+        await completeParsingLog();
+
+        return;
+      }
     } catch (error) {}
   }
 
-  private async fetchMileageCarsForYearsFromAv({
-    brandId,
-    modelId,
-    brandUUID,
-    modelUUID,
-    withPhotos,
-    generation,
-  }: IFetchMileageCarsForYearsFromAv) {
+  async queryFetchWithBrandUUID(brandUUID: string, withPhotos: string) {
+    const gens = await this.generationRepository.findAll({
+      where: { brandUUID },
+      include: { all: true },
+    });
+
+    for (let i = 0; i < gens.length; i++) {
+      await this.fetchPerGenWrapper(gens[i], withPhotos);
+    }
+  }
+
+  async queryFetchWithGens(generationUUIDs: string, withPhotos: string) {
+    const genUUIDsArr = generationUUIDs.split(',');
+
+    for (let i = 0; i < genUUIDsArr.length; i++) {
+      const genUUID = genUUIDsArr[i];
+
+      const gen = await this.generationRepository.findOne({
+        where: { uuid: genUUID },
+        include: { all: true },
+      });
+
+      await this.fetchPerGenWrapper(gen, withPhotos);
+    }
+  }
+
+  async queryFetchWithModelUUID(modelUUID: string, withPhotos: string) {
+    const gens = await this.generationRepository.findAll({
+      where: { modelUUID },
+      include: { all: true },
+    });
+
+    for (let i = 0; i < gens.length; i++) {
+      await this.fetchPerGenWrapper(gens[i], withPhotos);
+    }
+  }
+
+  async fetchAll(withPhotos) {
     try {
-      const gens = await this.getGensFromAVBY(brandId, modelId);
+      const gens = await this.generationRepository.findAll({
+        include: {
+          all: true,
+        },
+      });
 
       if (gens.length) {
         for (let j = 0; j < gens.length; j++) {
-          if (generation || generation === 0) {
-            if (generation === gens[j].id) {
-              if (gens[j]?.yearTo && gens[j]?.yearFrom) {
-                for (let k = gens[j]?.yearFrom; k <= gens[j]?.yearTo; k++) {
-                  await this.fetchMileageCarsPerYearFromAv({
-                    brandId,
-                    modelId,
-                    genId: gens[j].id,
-                    year: k,
-                    genName: gens[j].name,
-                    brandUUID,
-                    modelUUID,
-                    withPhotos,
-                  });
-                }
-              }
-
-              if (!gens[j]?.yearTo && gens[j]?.yearFrom) {
-                const year = new Date().getFullYear();
-
-                for (let k = gens[j]?.yearFrom; k <= year; k++) {
-                  await this.fetchMileageCarsPerYearFromAv({
-                    brandId,
-                    modelId,
-                    genId: gens[j].id,
-                    year: k,
-                    genName: gens[j].name,
-                    brandUUID,
-                    modelUUID,
-                    withPhotos,
-                  });
-                }
-              }
-            }
-          } else {
-            if (gens[j]?.yearTo && gens[j]?.yearFrom) {
-              for (let k = gens[j]?.yearFrom; k <= gens[j]?.yearTo; k++) {
-                await this.fetchMileageCarsPerYearFromAv({
-                  brandId,
-                  modelId,
-                  genId: gens[j].id,
-                  year: k,
-                  genName: gens[j].name,
-                  brandUUID,
-                  modelUUID,
-                  withPhotos,
-                });
-              }
-            }
-
-            if (!gens[j]?.yearTo && gens[j]?.yearFrom) {
-              const year = new Date().getFullYear();
-
-              for (let k = gens[j]?.yearFrom; k <= year; k++) {
-                await this.fetchMileageCarsPerYearFromAv({
-                  brandId,
-                  modelId,
-                  genId: gens[j].id,
-                  year: k,
-                  genName: gens[j].name,
-                  brandUUID,
-                  modelUUID,
-                  withPhotos,
-                });
-              }
-            }
-          }
+          await this.fetchPerGenWrapper(gens[j], withPhotos);
         }
       }
     } catch (error) {}
   }
 
-  private async getLastSoldMileageCarsFromAVBY(
-    brandId: number,
-    modelId: number,
-    genId: number,
-    year: number,
-  ) {
+  async fetchPerGenWrapper(gen: GenerationSchema, withPhotos) {
+    const config = {
+      brandUUID: gen.brand.uuid,
+      brandId: gen.brand.customIds.avby,
+      brandName: gen.brand.title,
+      modelUUID: gen.model.uuid,
+      modelId: gen.model.customIds.avby,
+      modelName: gen.model.title,
+      genUUID: gen.uuid,
+      genId: gen.customIds.avby,
+      genName: gen.title,
+      year: null,
+      withPhotos: withPhotos === '1',
+    };
+
+    if (gen?.yearTo && gen?.yearFrom) {
+      for (let k = gen?.yearFrom; k <= gen?.yearTo; k++) {
+        config.year = k;
+
+        await this.fetchMileageCarsPerYearFromAv(config);
+      }
+    }
+
+    if (!gen?.yearTo && gen?.yearFrom) {
+      const year = new Date().getFullYear();
+
+      for (let k = gen?.yearFrom; k <= year; k++) {
+        config.year = k;
+
+        await this.fetchMileageCarsPerYearFromAv(config);
+      }
+    }
+  }
+
+  private async getLastSoldMileageCarsFromAVBY(config: ILastSoldCarsConfig) {
+    const { brandId, modelId, genId, year } = config;
     const url = `https://api.av.by/offer-types/cars/price-statistics?brand=${brandId}&generation=${genId}&model=${modelId}&year=${year}`;
 
     try {
@@ -198,23 +168,18 @@ export class AVBYService {
     } catch (error) {}
   }
 
-  private async fetchMileageCarsPerYearFromAv({
-    brandId,
-    modelId,
-    genId,
-    year,
-    genName,
-    brandUUID,
-    modelUUID,
-    withPhotos,
-  }) {
+  private async fetchMileageCarsPerYearFromAv(
+    config: IMileageCarPerYearConfig,
+  ) {
     try {
-      const data = await this.getLastSoldMileageCarsFromAVBY(
-        brandId,
-        modelId,
-        genId,
-        year,
-      );
+      const avFetchConfig = {
+        brandId: config.brandId,
+        modelId: config.modelId,
+        genId: config.genId,
+        year: config.year,
+      };
+
+      const data = await this.getLastSoldMileageCarsFromAVBY(avFetchConfig);
 
       if (data.lastSoldAdverts.length) {
         for (let i = 0; i < data.lastSoldAdverts.length; i++) {
@@ -222,60 +187,35 @@ export class AVBYService {
 
           await this.checkLastSoldCarAndCreate({
             lastSoldCar,
-            brandId,
-            modelId,
-            genId: genId,
-            genName,
-            year,
-            brandUUID,
-            modelUUID,
-            withPhotos,
+            ...config,
           });
         }
       }
     } catch (error) {}
   }
 
-  private async checkLastSoldCarAndCreate({
-    lastSoldCar,
-    brandUUID,
-    modelUUID,
-    modelId,
-    brandId,
-    genId,
-    genName,
-    year,
-    withPhotos,
-  }) {
+  private async checkLastSoldCarAndCreate(
+    config: IMileageCarPerYearCreateConfig,
+  ) {
     try {
       const carFromDB = await this.mileageCarsService.findOneByAvId(
-        lastSoldCar.id,
+        config.lastSoldCar.id,
       );
 
       if (!carFromDB) {
-        const photosUrls = getPhotosUrlsFromLastSoldAvCar(lastSoldCar);
+        const photosUrls = getPhotosUrlsFromLastSoldAvCar(config.lastSoldCar);
 
         let photosUUIDs: string[] = [];
 
-        if (withPhotos) {
+        if (config.withPhotos) {
           photosUUIDs = await this.fetchPhotosFromAv({
-            brandName: findValueFromProps('brand', lastSoldCar),
-            modelName: findValueFromProps('model', lastSoldCar),
-            genName,
-            year,
+            ...config,
             photosUrls,
           });
         }
 
         const createCarConfig = createCarConfigHelper({
-          brandUUID,
-          modelUUID,
-          genName,
-          brandId,
-          modelId,
-          genId,
-          year,
-          lastSoldCar,
+          ...config,
           photosUUIDs,
           photosUrls,
         });
@@ -287,17 +227,9 @@ export class AVBYService {
     }
   }
 
-  private async getGensFromAVBY(brandId: number, modelId: number) {
-    try {
-      const { data } = await axios.get<Array<IGenerationFromAv>>(
-        `https://api.av.by/offer-types/cars/catalog/brand-items/${brandId}/models/${modelId}/generations`,
-      );
+  async fetchPhotosFromAv(config: IFetchPhotosConfig) {
+    const { brandName, modelName, genName, year, photosUrls } = config;
 
-      return data;
-    } catch (error) {}
-  }
-
-  async fetchPhotosFromAv({ brandName, modelName, genName, year, photosUrls }) {
     const photosUUIDs = await this.fileService.fetchPhotosFromAv({
       brandName,
       modelName,

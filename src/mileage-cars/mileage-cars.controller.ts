@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Query, Post } from '@nestjs/common';
+import { Body, Controller, Get, Query, Post, Param } from '@nestjs/common';
 
 import { MileageCarsService } from './mileage-cars.service';
 import {
@@ -20,9 +20,26 @@ export class MileageCarsController {
     return this.mileageCarsService.changeProperties();
   }
 
+  @Get('count')
+  getCount() {
+    return this.mileageCarsService.getCount();
+  }
+
+  @Get('add-generation')
+  addGens() {
+    return this.mileageCarsService.addGeneration();
+  }
+
   @Post()
   getAll(@Body() getMileageCars: GetMileageCars) {
     return this.mileageCarsService.getAll(getMileageCars);
+  }
+
+  @Get(':uuid')
+  getOneByUUID(@Param('uuid') uuid: string) {
+    console.log(uuid);
+
+    return this.mileageCarsService.getCarByUUID(uuid);
   }
 
   @Post('delete')
@@ -33,5 +50,10 @@ export class MileageCarsController {
   @Get('fetch-all')
   fetchAllMileageCars(@Query() query: FetchMileageCarsQuery) {
     return this.avbyService.fetchAllMileageCarsFromAV(query);
+  }
+
+  @Get('all')
+  fetchAll(@Query('withPhotos') withPhotos: string) {
+    return this.avbyService.fetchAll(withPhotos);
   }
 }

@@ -6,6 +6,39 @@ interface IMileageCarFromAvTitle {
   image: string;
 }
 
+export interface ILastSoldCarsConfig {
+  brandId: number;
+  modelId: number;
+  year: number;
+  genId: number;
+}
+
+export interface IMileageCarPerYearConfig {
+  brandUUID: string;
+  brandId: number;
+  brandName: string;
+  modelUUID: string;
+  modelId: number;
+  modelName: string;
+  genUUID: string;
+  genId: number;
+  genName: string;
+  year: number | null;
+  withPhotos: boolean;
+}
+
+export interface IMileageCarPerYearCreateConfig
+  extends IMileageCarPerYearConfig {
+  lastSoldCar: ILastSoldMileageCarFromAv;
+}
+
+export interface IFetchPhotosConfig extends IMileageCarPerYearCreateConfig {
+  photosUrls: string[];
+}
+export interface ICreateCarConfig extends IFetchPhotosConfig {
+  photosUUIDs: string[];
+}
+
 interface Ititle {
   brand: string;
   generation: string;

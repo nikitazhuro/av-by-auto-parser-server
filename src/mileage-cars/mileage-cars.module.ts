@@ -1,20 +1,22 @@
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Module } from '@nestjs/common';
 
-import { MileageCarsModel } from './mileage-cars.model';
+import { MileageCarsSchema } from './mileage-cars.schema';
 import { MileageCarsController } from './mileage-cars.controller';
 import { MileageCarsService } from './mileage-cars.service';
-import { ModelSchema } from 'src/model/model.model';
+import { ModelSchema } from 'src/model/model.schema';
 import { AVBYService } from './avby.service';
 import { FileModule } from 'src/files/file.module';
-import { BrandModel } from 'src/brand/brand.model';
+import { BrandSchema } from 'src/brand/brand.schema';
+import { GenerationSchema } from 'src/generation/generation.schema';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
       ModelSchema,
-      MileageCarsModel,
-      BrandModel,
+      GenerationSchema,
+      MileageCarsSchema,
+      BrandSchema,
       ModelSchema,
     ]),
     FileModule,

@@ -29,9 +29,9 @@ export class DeleteCar {
 }
 
 export class FetchMileageCarsQuery {
-  readonly brand?: string;
-  readonly model?: string;
-  readonly generations?: string;
+  readonly brandUUID: string;
+  readonly modelUUID?: string;
+  readonly generationUUIDs?: string;
   readonly year?: string;
   readonly withPhotos: string;
 }

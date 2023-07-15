@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 
 import { ModelService } from './model.service';
 
@@ -7,8 +7,13 @@ export class ModelController {
   constructor(private readonly modelService: ModelService) {}
 
   @Get()
-  getModels() {
-    return this.modelService.getModels();
+  getModels(@Query('brand') brand: string) {
+    return this.modelService.getModels(brand);
+  }
+
+  @Get('brand-models')
+  getBrandModels(@Query('brandUUID') brandUUID: string) {
+    return this.modelService.getModelsByBrand(brandUUID);
   }
 
   @Get('av-fetch')

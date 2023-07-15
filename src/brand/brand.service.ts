@@ -3,15 +3,19 @@ import { InjectModel } from '@nestjs/sequelize';
 import axios from 'axios';
 import { v4 } from 'uuid';
 
-import { BrandModel, IMileageCar } from './brand.model';
+import { BrandSchema, IMileageCar } from './brand.schema';
 import { CreateBrandDto } from './dto/brands.dto';
 
 @Injectable()
 export class BrandService {
   constructor(
-    @InjectModel(BrandModel)
-    private brandsRepository: typeof BrandModel,
+    @InjectModel(BrandSchema)
+    private brandsRepository: typeof BrandSchema,
   ) {}
+
+  async getBrands() {
+    return this.brandsRepository.findAll();
+  }
 
   async getBrandsFromAVBY() {
     return this.brandsRepository.findAll({

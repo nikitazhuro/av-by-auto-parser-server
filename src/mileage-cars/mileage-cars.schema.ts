@@ -7,8 +7,9 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 
-import { BrandModel } from 'src/brand/brand.model';
-import { ModelSchema } from 'src/model/model.model';
+import { BrandSchema } from 'src/brand/brand.schema';
+import { GenerationSchema } from 'src/generation/generation.schema';
+import { ModelSchema } from 'src/model/model.schema';
 
 export interface ICustomIds {
   avby: {
@@ -23,7 +24,7 @@ export interface IMileageCar {
   uuid: string;
   brandUUID: string;
   modelUUID: string;
-  generation: string;
+  generationUUID: string;
   customIds: ICustomIds;
   year: number;
   photos: Array<string>;
@@ -32,15 +33,15 @@ export interface IMileageCar {
 }
 
 @Table({ tableName: 'mileage_cars_new_test' })
-export class MileageCarsModel extends Model<MileageCarsModel, IMileageCar> {
+export class MileageCarsSchema extends Model<MileageCarsSchema, IMileageCar> {
   @Column({ primaryKey: true, type: DataType.UUID })
   uuid: string;
 
-  @ForeignKey(() => BrandModel)
+  @ForeignKey(() => BrandSchema)
   brandUUID: string;
 
-  @BelongsTo(() => BrandModel)
-  brand: BrandModel;
+  @BelongsTo(() => BrandSchema)
+  brand: BrandSchema;
 
   @ForeignKey(() => ModelSchema)
   modelUUID: string;
@@ -48,8 +49,11 @@ export class MileageCarsModel extends Model<MileageCarsModel, IMileageCar> {
   @BelongsTo(() => ModelSchema)
   model: ModelSchema;
 
-  @Column({ type: DataType.STRING })
-  generation: string;
+  @ForeignKey(() => GenerationSchema)
+  generationUUID: string;
+
+  @BelongsTo(() => GenerationSchema)
+  generation: GenerationSchema;
 
   @Column({ type: DataType.JSON })
   customIds: ICustomIds;

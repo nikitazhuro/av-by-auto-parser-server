@@ -3,24 +3,31 @@ import { InjectModel } from '@nestjs/sequelize';
 import axios from 'axios';
 import { v4 } from 'uuid';
 
-import { ModelSchema, IModel } from './model.model';
+import { ModelSchema, IModel } from './model.schema';
 import { CreateModelDto } from './dto/model.dto';
-import { BrandModel } from 'src/brand/brand.model';
+import { BrandSchema } from 'src/brand/brand.schema';
 
 @Injectable()
 export class ModelService {
   constructor(
     @InjectModel(ModelSchema)
     private modelsRepository: typeof ModelSchema,
-    @InjectModel(BrandModel)
-    private brandsRepository: typeof BrandModel,
+    @InjectModel(BrandSchema)
+    private brandsRepository: typeof BrandSchema,
   ) {}
 
-  async getModels() {
+  async getModels(brand: string) {
     return this.modelsRepository.findAll({
-      include: {
-        all: true,
+      where: {
+        brandUUID: brand,
       },
+    });
+  }
+
+  async getModelsByBrand(brandUUID: string) {
+    return this.modelsRepository.findAll({
+      where: { brandUUID },
+      include: { all: true },
     });
   }
   async fetchModelsFromAVBY() {

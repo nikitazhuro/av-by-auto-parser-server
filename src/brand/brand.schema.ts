@@ -1,5 +1,6 @@
 import { Table, Column, DataType, Model, HasMany } from 'sequelize-typescript';
-import { ModelSchema } from 'src/model/model.model';
+import { GenerationSchema } from 'src/generation/generation.schema';
+import { ModelSchema } from 'src/model/model.schema';
 
 export interface ICustomIds {
   avby: number;
@@ -12,7 +13,7 @@ export interface IMileageCar {
 }
 
 @Table({ tableName: 'brands' })
-export class BrandModel extends Model<BrandModel, IMileageCar> {
+export class BrandSchema extends Model<BrandSchema, IMileageCar> {
   @Column({ primaryKey: true, type: DataType.UUID })
   uuid: string;
 
@@ -24,4 +25,7 @@ export class BrandModel extends Model<BrandModel, IMileageCar> {
 
   @HasMany(() => ModelSchema)
   models: ModelSchema[];
+
+  @HasMany(() => GenerationSchema)
+  generations: GenerationSchema[];
 }

@@ -5,9 +5,11 @@ import {
   Model,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 
-import { BrandModel } from 'src/brand/brand.model';
+import { BrandSchema } from 'src/brand/brand.schema';
+import { GenerationSchema } from 'src/generation/generation.schema';
 
 export interface ICustomIds {
   avby: number;
@@ -31,9 +33,12 @@ export class ModelSchema extends Model<ModelSchema, IModel> {
   @Column({ type: DataType.JSON })
   customIds: ICustomIds;
 
-  @ForeignKey(() => BrandModel)
+  @ForeignKey(() => BrandSchema)
   brandUUID: string;
 
-  @BelongsTo(() => BrandModel)
-  brand: BrandModel;
+  @BelongsTo(() => BrandSchema)
+  brand: BrandSchema;
+
+  @HasMany(() => GenerationSchema)
+  generations: GenerationSchema[];
 }

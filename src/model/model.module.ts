@@ -1,13 +1,16 @@
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Module } from '@nestjs/common';
 
-import { ModelSchema } from './model.model';
+import { ModelSchema } from './model.schema';
 import { ModelController } from './model.controller';
 import { ModelService } from './model.service';
-import { BrandModel } from 'src/brand/brand.model';
+import { BrandSchema } from 'src/brand/brand.schema';
+import { GenerationSchema } from 'src/generation/generation.schema';
 
 @Module({
-  imports: [SequelizeModule.forFeature([ModelSchema, BrandModel])],
+  imports: [
+    SequelizeModule.forFeature([ModelSchema, BrandSchema, GenerationSchema]),
+  ],
   controllers: [ModelController],
   providers: [ModelService],
   exports: [ModelService],
