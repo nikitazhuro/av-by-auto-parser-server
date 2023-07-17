@@ -35,12 +35,12 @@ export class MileageCarsController {
     return this.mileageCarsService.getAll(getMileageCars);
   }
 
-  @Get(':uuid')
-  getOneByUUID(@Param('uuid') uuid: string) {
-    console.log(uuid);
+  // @Get(':uuid')
+  // getOneByUUID(@Param('uuid') uuid: string) {
+  //   console.log(uuid);
 
-    return this.mileageCarsService.getCarByUUID(uuid);
-  }
+  //   return this.mileageCarsService.getCarByUUID(uuid);
+  // }
 
   @Post('delete')
   gelete(@Body() deleteCar: DeleteCar) {
@@ -50,10 +50,5 @@ export class MileageCarsController {
   @Get('fetch-all')
   fetchAllMileageCars(@Query() query: FetchMileageCarsQuery) {
     return this.avbyService.fetchAllMileageCarsFromAV(query);
-  }
-
-  @Get('all')
-  fetchAll(@Query('withPhotos') withPhotos: string) {
-    return this.avbyService.fetchAll(withPhotos);
   }
 }
