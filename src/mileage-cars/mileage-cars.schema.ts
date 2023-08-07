@@ -1,3 +1,4 @@
+import { MileageCarsNumbersSchema } from 'src/mileage-cars/mileage-cars-numbers.schema';
 import {
   Table,
   Column,
@@ -5,11 +6,13 @@ import {
   Model,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
 } from 'sequelize-typescript';
 
 import { BrandSchema } from 'src/brand/brand.schema';
 import { GenerationSchema } from 'src/generation/generation.schema';
 import { ModelSchema } from 'src/model/model.schema';
+import { PhoneNumbersSchema } from 'src/phone-number/phone-numbers.schema';
 
 export interface ICustomIds {
   avby: {
@@ -32,7 +35,7 @@ export interface IMileageCar {
   data: any;
 }
 
-@Table({ tableName: 'mileage_cars_new_test' })
+@Table({ tableName: 'mileage_cars' })
 export class MileageCarsSchema extends Model<MileageCarsSchema, IMileageCar> {
   @Column({ primaryKey: true, type: DataType.UUID })
   uuid: string;
@@ -69,4 +72,7 @@ export class MileageCarsSchema extends Model<MileageCarsSchema, IMileageCar> {
 
   @Column({ type: DataType.JSON })
   data: any;
+
+  @BelongsToMany(() => PhoneNumbersSchema, () => MileageCarsNumbersSchema)
+  phoneNumbers: PhoneNumbersSchema[];
 }

@@ -5,6 +5,9 @@ import { DeleteCar, GetMileageCars } from './dto/mileage-cars.dto';
 import { MileageCarsSchema } from './mileage-cars.schema';
 import { GenerationSchema } from 'src/generation/generation.schema';
 import { createMileageCarsGetAllWhereConfig } from './utils/mileageCarsGetAllHelper';
+import { PhoneNumbersSchema } from 'src/phone-number/phone-numbers.schema';
+import { Op } from 'sequelize';
+import axios from 'axios';
 
 @Injectable()
 export class MileageCarsService {
@@ -13,6 +16,8 @@ export class MileageCarsService {
     private mileageCarsRepository: typeof MileageCarsSchema,
     @InjectModel(GenerationSchema)
     private generationRepository: typeof GenerationSchema,
+    @InjectModel(PhoneNumbersSchema)
+    private phoneNumbersRepository: typeof PhoneNumbersSchema,
   ) {}
 
   async changeProperties() {
@@ -123,5 +128,31 @@ export class MileageCarsService {
     } catch (error) {
       return new HttpException('Ошибка при удалении', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async compareCarsWithNumbers() {
+    const cars = await this.mileageCarsRepository.findAll();
+
+    for (let i = 0; i < cars.length; i++) {
+      const where = {
+        avCarsIds: {
+          [Op.contains]: [cars[i].customIds.avby.carId],
+        },
+      };
+
+      const phones = await this.phoneNumbersRepository.findAll({
+        where,
+      });
+
+      if (phones.length) {
+        await cars[i].$set('phoneNumbers', [...phones.map((e) => e.uuid)]);
+
+        cars[i].phoneNumbers = [...phones];
+      }
+    }
+
+    console.log('Compare complete', new Date().toISOString());
+
+    return 'OK';
   }
 }

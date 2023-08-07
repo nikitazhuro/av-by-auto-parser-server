@@ -51,4 +51,9 @@ export class MileageCarsController {
   fetchAllMileageCars(@Query() query: FetchMileageCarsQuery) {
     return this.avbyService.fetchAllMileageCarsFromAV(query);
   }
+
+  @Get('compare-numbers')
+  compareCarsWithNumbers() {
+    return this.mileageCarsService.compareCarsWithNumbers();
+  }
 }

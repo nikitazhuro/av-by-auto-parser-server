@@ -1,17 +1,21 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { join } from 'path';
+import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { MileageCarsModule } from './mileage-cars/mileage-cars.module';
-import { MileageCarsSchema } from './mileage-cars/mileage-cars.schema';
-import { ConfigModule } from '@nestjs/config';
-import { BrandSchema } from './brand/brand.schema';
 import { BrandModule } from './brand/brand.module';
 import { ModelModule } from './model/model.module';
-import { ModelSchema } from './model/model.schema';
-import { join } from 'path';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { GenerationSchema } from './generation/generation.schema';
 import { GenerationModule } from './generation/generation.module';
+import { PhoneNumbersModule } from './phone-number/phone-numbers.module';
+
+import { MileageCarsSchema } from './mileage-cars/mileage-cars.schema';
+import { BrandSchema } from './brand/brand.schema';
+import { ModelSchema } from './model/model.schema';
+import { GenerationSchema } from './generation/generation.schema';
+import { PhoneNumbersSchema } from './phone-number/phone-numbers.schema';
+import { MileageCarsNumbersSchema } from './mileage-cars/mileage-cars-numbers.schema';
 
 @Module({
   imports: [
@@ -25,7 +29,14 @@ import { GenerationModule } from './generation/generation.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [MileageCarsSchema, BrandSchema, ModelSchema, GenerationSchema],
+      models: [
+        MileageCarsSchema,
+        BrandSchema,
+        ModelSchema,
+        GenerationSchema,
+        PhoneNumbersSchema,
+        MileageCarsNumbersSchema,
+      ],
       autoLoadModels: true,
     }),
     ServeStaticModule.forRoot({
@@ -35,6 +46,7 @@ import { GenerationModule } from './generation/generation.module';
     ModelModule,
     BrandModule,
     GenerationModule,
+    PhoneNumbersModule,
   ],
   controllers: [],
   providers: [],
