@@ -26,6 +26,8 @@ export class PhoneNumbersService {
         const brandId = models[i].brand.customIds.avby;
         const modelId = models[i].customIds.avby;
 
+        console.log(brandId, modelId);
+
         const firstPageCars = await this.fetchCarsPerPage(1, brandId, modelId);
 
         await this.fetchNumbersPerCarsPage(firstPageCars);
@@ -84,6 +86,12 @@ export class PhoneNumbersService {
             name: 'price_currency',
             value: 2,
           },
+          {
+            modified: true,
+            name: 'creation_date',
+            previousValue: null,
+            value: 11,
+          },
         ],
       },
     );
@@ -92,6 +100,7 @@ export class PhoneNumbersService {
   async fetchNumbersPerCarsPage(carsPerPage) {
     for (let i = 0; i < carsPerPage.data.adverts.length; i++) {
       const { id } = carsPerPage.data.adverts[i];
+      console.log(id);
 
       try {
         const { data: numbersList } = await axios.get<Array<any>>(
