@@ -13,6 +13,7 @@ import { BrandSchema } from 'src/brand/brand.schema';
 import { GenerationSchema } from 'src/generation/generation.schema';
 import { ModelSchema } from 'src/model/model.schema';
 import { PhoneNumbersSchema } from 'src/phone-number/phone-numbers.schema';
+import { VinSchema } from 'src/vin/vin.schema';
 
 export interface ICustomIds {
   avby: {
@@ -49,6 +50,9 @@ export class MileageCarsSchema extends Model<MileageCarsSchema, IMileageCar> {
   @ForeignKey(() => ModelSchema)
   modelUUID: string;
 
+  @ForeignKey(() => VinSchema)
+  vinUUID: string;
+
   @BelongsTo(() => ModelSchema)
   model: ModelSchema;
 
@@ -75,4 +79,7 @@ export class MileageCarsSchema extends Model<MileageCarsSchema, IMileageCar> {
 
   @BelongsToMany(() => PhoneNumbersSchema, () => MileageCarsNumbersSchema)
   phoneNumbers: PhoneNumbersSchema[];
+
+  @BelongsTo(() => VinSchema)
+  vin: VinSchema;
 }

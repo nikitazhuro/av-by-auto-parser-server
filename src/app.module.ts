@@ -16,6 +16,8 @@ import { ModelSchema } from './model/model.schema';
 import { GenerationSchema } from './generation/generation.schema';
 import { PhoneNumbersSchema } from './phone-number/phone-numbers.schema';
 import { MileageCarsNumbersSchema } from './mileage-cars/mileage-cars-numbers.schema';
+import { VinModule } from './vin/vin.module';
+import { VinSchema } from './vin/vin.schema';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { MileageCarsNumbersSchema } from './mileage-cars/mileage-cars-numbers.sc
         GenerationSchema,
         PhoneNumbersSchema,
         MileageCarsNumbersSchema,
+        VinSchema,
       ],
       autoLoadModels: true,
     }),
@@ -47,6 +50,7 @@ import { MileageCarsNumbersSchema } from './mileage-cars/mileage-cars-numbers.sc
     BrandModule,
     GenerationModule,
     PhoneNumbersModule,
+    VinModule,
   ],
   controllers: [],
   providers: [],

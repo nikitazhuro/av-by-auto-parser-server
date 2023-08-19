@@ -10,6 +10,7 @@ import { FileModule } from 'src/files/file.module';
 import { BrandSchema } from 'src/brand/brand.schema';
 import { GenerationSchema } from 'src/generation/generation.schema';
 import { PhoneNumbersSchema } from 'src/phone-number/phone-numbers.schema';
+import { VinSchema } from 'src/vin/vin.schema';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PhoneNumbersSchema } from 'src/phone-number/phone-numbers.schema';
       BrandSchema,
       ModelSchema,
       PhoneNumbersSchema,
+      VinSchema,
     ]),
     FileModule,
   ],
