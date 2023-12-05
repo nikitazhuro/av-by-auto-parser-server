@@ -37,8 +37,6 @@ export class MileageCarsController {
 
   // @Get(':uuid')
   // getOneByUUID(@Param('uuid') uuid: string) {
-  //   console.log(uuid);
-
   //   return this.mileageCarsService.getCarByUUID(uuid);
   // }
 

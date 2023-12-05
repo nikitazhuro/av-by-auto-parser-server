@@ -205,14 +205,14 @@ export class AVBYService {
       if (!carFromDB) {
         const photosUrls = getPhotosUrlsFromLastSoldAvCar(config.lastSoldCar);
 
-        let photosUUIDs: string[] = [];
+        const photosUUIDs: string[] = [];
 
-        if (config.withPhotos) {
-          photosUUIDs = await this.fetchPhotosFromAv({
-            ...config,
-            photosUrls,
-          });
-        }
+        // if (config.withPhotos) {
+        //   photosUUIDs = await this.fetchPhotosFromAv({
+        //     ...config,
+        //     photosUrls,
+        //   });
+        // }
 
         const createCarConfig = createCarConfigHelper({
           ...config,

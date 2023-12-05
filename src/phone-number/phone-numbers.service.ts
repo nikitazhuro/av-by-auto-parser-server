@@ -6,6 +6,7 @@ import { PhoneNumbersSchema } from './phone-numbers.schema';
 import { v4 } from 'uuid';
 import { ModelSchema } from 'src/model/model.schema';
 import { Op } from 'sequelize';
+import { MileageCarsNumbersSchema } from 'src/mileage-cars/mileage-cars-numbers.schema';
 
 @Injectable()
 export class PhoneNumbersService {
@@ -14,6 +15,8 @@ export class PhoneNumbersService {
     private phoneNumbersRepository: typeof PhoneNumbersSchema,
     @InjectModel(ModelSchema)
     private modelRepository: typeof ModelSchema,
+    @InjectModel(MileageCarsNumbersSchema)
+    private mileageCarsNumbersRepository: typeof MileageCarsNumbersSchema,
   ) {}
 
   async fetchAll() {
@@ -141,6 +144,22 @@ export class PhoneNumbersService {
     return this.phoneNumbersRepository.findOne({
       where: {
         number,
+      },
+    });
+  }
+
+  async getPhoneNumbersByUUID(uuid: string) {
+    return this.phoneNumbersRepository.findOne({
+      where: {
+        uuid,
+      },
+    });
+  }
+
+  async getAllCompareNumbers() {
+    return this.mileageCarsNumbersRepository.findAll({
+      include: {
+        all: true,
       },
     });
   }

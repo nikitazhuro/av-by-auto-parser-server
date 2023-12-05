@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 
 import { PhoneNumbersService } from './phone-numbers.service';
 
@@ -9,6 +9,16 @@ export class PhoneNumbersController {
   @Get('fetch-all')
   fetchAll() {
     return this.phoneNumbersService.fetchAll();
+  }
+
+  @Get('phone-cars')
+  getAllCompareNumbers() {
+    return this.phoneNumbersService.getAllCompareNumbers();
+  }
+
+  @Get(':uuid')
+  getPhoneNumbersByUUID(@Param('uuid') uuid: string) {
+    return this.phoneNumbersService.getPhoneNumbersByUUID(uuid);
   }
 
   @Get('count')

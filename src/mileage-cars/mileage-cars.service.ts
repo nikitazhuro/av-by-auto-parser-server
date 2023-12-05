@@ -131,7 +131,11 @@ export class MileageCarsService {
   }
 
   async compareCarsWithNumbers() {
-    const cars = await this.mileageCarsRepository.findAll();
+    const cars = await this.mileageCarsRepository.findAll({
+      include: {
+        all: true,
+      },
+    });
 
     for (let i = 0; i < cars.length; i++) {
       const where = {
@@ -147,7 +151,7 @@ export class MileageCarsService {
       if (phones.length) {
         await cars[i].$set('phoneNumbers', [...phones.map((e) => e.uuid)]);
 
-        cars[i].phoneNumbers = [...phones];
+        // cars[i].phoneNumbers = [...phones];
       }
     }
 

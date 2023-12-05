@@ -4,6 +4,7 @@ import {
   DataType,
   Model,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 
 import { MileageCarsSchema } from './mileage-cars.schema';
@@ -36,4 +37,10 @@ export class MileageCarsNumbersSchema extends Model<MileageCarsNumbersSchema> {
   @ForeignKey(() => PhoneNumbersSchema)
   @Column({ type: DataType.STRING })
   phoneNumberUUID: string;
+
+  @BelongsTo(() => MileageCarsSchema)
+  mileageCar: MileageCarsSchema;
+
+  @BelongsTo(() => PhoneNumbersSchema)
+  phoneNumber: PhoneNumbersSchema[];
 }
